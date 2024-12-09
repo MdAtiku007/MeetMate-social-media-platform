@@ -38,6 +38,7 @@ Scroll/Load More: Pagination or infinite scroll to keep the feed manageable.
 - **CSS**: For styling the login page.
 - **JavaScript**: For client-side form validation.
 
+ 
 
 #Before running the project, ensure you have **Node.js** and **npm** (Node Package Manager) installed on your machine.
 
