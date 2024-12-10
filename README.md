@@ -39,10 +39,11 @@ Scroll/Load More: Pagination or infinite scroll to keep the feed manageable.
 - **JavaScript**: For client-side form validation.
 
 
-## How to Run the Project:
+## How to Run the Project on locally code editor:
 Make sure you have Node.js installed.
 # Install dependencies: npm install express bcrypt body-parser
 to run take codes from above  files and save  in the respective files .
+
 
 # Run the server:node server.js
 # Open a browser and go to http://localhost:3000.
