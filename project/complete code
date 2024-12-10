@@ -1,0 +1,94 @@
+const express = require('express');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const path = require('path');
+
+const app = express();
+const port = 3000;
+
+// Dummy users array (You can replace this with a real database later)
+const users = [
+    { email: 'user@example.com', password: '$2b$10$L.Wr5tv2/iOszkVtq3g4r8OfbXQw5eD0mTb.RwmV0XpO2p5eI.kXi' } // Hashed password: 'password123'
+];
+
+// Set up view engine (JSP)
+app.set('view engine', 'jsp');
+app.set('views', path.join(__dirname, 'views'));
+
+// Middleware setup
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: true }));
+
+// Serve static files (e.g., CSS, JS)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Routes
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+app.get('/signup', (req, res) => {
+    res.render('signup');
+});
+
+app.get('/dashboard', (req, res) => {
+    if (req.session.user) {
+        res.render('dashboard', { user: req.session.user });
+    } else {
+        res.redirect('/login');
+    }
+});
+
+// Handle login logic
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    const user = users.find(user => user.email === email);
+
+    if (!user) {
+        return res.status(401).send('Invalid credentials');
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+        if (err || !result) {
+            return res.status(401).send('Invalid credentials');
+        }
+
+        req.session.user = { email: user.email };
+        res.redirect('/dashboard');
+    });
+});
+
+// Handle signup logic
+app.post('/signup', (req, res) => {
+    const { email, password } = req.body;
+    const existingUser = users.find(user => user.email === email);
+
+    if (existingUser) {
+        return res.status(400).send('Email already in use');
+    }
+
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+        if (err) {
+            return res.status(500).send('Error hashing password');
+        }
+
+        users.push({ email, password: hashedPassword });
+        res.redirect('/login');
+    });
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Failed to log out');
+        }
+        res.redirect('/login');
+    });
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
